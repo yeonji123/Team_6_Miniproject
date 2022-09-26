@@ -11,5 +11,5 @@
 | 이재문| 2020315002 | asdaff | su9king@gmail.com |
 | 신종락| 2020315010 | ShinJongRock | whdfkr0630@gmail.com
 
-#결과 페이지
+# 결과 페이지
 ![image](https://user-images.githubusercontent.com/75960352/192227276-677fa57a-2455-4af8-8f1c-fe0847143b84.png)
