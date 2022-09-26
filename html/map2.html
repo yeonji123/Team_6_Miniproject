@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link" href="#">Features</a>
+                    <a class="nav-link" href="#">Pricing</a>
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+
+    <style>
+        .wrap {
+            position: absolute;
+            left: 0;
+            bottom: 40px;
+            width: 288px;
+            height: 132px;
+            margin-left: -144px;
+            text-align: left;
+            overflow: hidden;
+            font-size: 12px;
+            font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;
+            line-height: 1.5;
+        }
+
+        .wrap * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .wrap .info {
+            width: 100;
+            height: 80px;
+            border-radius: 5px;
+            border-bottom: 2px solid #ccc;
+            border-right: 1px solid #ccc;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .wrap .info:nth-child(1) {
+            border: 0;
+            box-shadow: 0px 1px 2px #888;
+        }
+
+        .info .title {
+            padding: 5px 0 0 10px;
+            height: 30px;
+            background: #eee;
+            border-bottom: 1px solid #ddd;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .info .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #888;
+            width: 17px;
+            height: 17px;
+            background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/overlay_close.png');
+        }
+
+        .info .close:hover {
+            cursor: pointer;
+        }
+
+        .info .body {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info .desc {
+            position: relative;
+            margin: 13px 0 0 90px;
+            height: 75px;
+        }
+
+        .desc .ellipsis {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .desc .jibun {
+            font-size: 11px;
+            color: #888;
+            margin-top: -2px;
+        }
+
+        .info .img {
+            position: absolute;
+            top: 6px;
+            left: 5px;
+            width: 73px;
+            height: 71px;
+            border: 1px solid #ddd;
+            color: #888;
+            overflow: hidden;
+        }
+
+        .info:after {
+            content: '';
+            position: absolute;
+            margin-left: -12px;
+            left: 50%;
+            bottom: 0;
+            width: 22px;
+            height: 12px;
+            background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')
+        }
+
+        .info .link {
+            color: #5085BB;
+        }
+    </style>
+
+<body>
+
+    <button id="bt1" onclick="bt1()"> 약국</button>
+    <button id="bt2" onclick="bt2()"> 보건소</button>
+    <button id="bt3" onclick="bt3()"> 국민 안심병원</button>
+    <button id="bt4" onclick="bt4()"> 신속 병원</button>
+
+
+
+</body>
+<script src="pharmacy.json" type="text/javascript"></script>
+
+
+<style>
+    body {
+        margin: 0px;
+    }
+
+    #map {
+        width: 100vw;
+        height: 100vh;
+        min-height: 500px;
+    }
+</style>
+
+
+<body>
+    <div id="map"></div>
+
+
+
+
+
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5d8523f1991d89306c8ec09b9e2840d7"></script>
+
+
+    <script>
+        var hospital = 0;   // 국민 안심 병원
+        var clinicjson = 0; // 보건소
+        var pharmacy = 0;   // 약국
+        var moon = 0;       // 신속병원
+
+        var positions1 = [];// 좌표값 배열
+        var positions2 = [];
+        var positions3 = [];
+        var positions4 = [];
+
+
+        var marker1 = []; //마커 삭제 배열
+        var marker2 = [];
+        var marker3 = [];
+        var marker4 = [];
+
+
+
+        var overlays1 = []; // 오버레이 객체 담을 리스트
+        var overlays2 = [];
+        var overlays3 = [];
+        var overlays4 = [];
+
+
+
+        var container = document.getElementById('map');     //지도
+        var options = {                                     //초기 이동 좌표값 
+            center: new kakao.maps.LatLng(36.7824629, 127.0048106),
+            level: 8
+        };
+        var map = new kakao.maps.Map(container, options); // 지도를 생성합니다
+
+
+
+
+
+        //마커 취소 함수 1,2,3,4
+        function RemoveMaker1() {
+            var cnt = marker1.length;
+            for (var i = 0; i < cnt; i++) {
+                marker1[i].setMap(null);
+                // overlist[i].setMap(null);    
+            }
+        }
+
+        function RemoveMaker2() {
+            var cnt = marker2.length;
+            for (var i = 0; i < cnt; i++) {
+                marker2[i].setMap(null);
+                // overlist[i].setMap(null);    
+
+            }
+        }
+
+        function RemoveMaker3() {
+            var cnt = marker3.length;
+            for (var i = 0; i < cnt; i++) {
+                marker3[i].setMap(null);
+                // overlist[i].setMap(null);    
+            }
+        }
+
+        function RemoveMaker4() {
+            var cnt = marker4.length;
+            for (var i = 0; i < cnt; i++) {
+                marker4[i].setMap(null);
+                // overlist[i].setMap(null);    
+            }
+        }
+
+
+
+
+        // ------------------ 마커 위에 뜬 overlay 삭제 ------------------
+        function closeOverlay1() {
+            for (let i = 0; i < marker1.length; i++) {
+                var m_title = marker1[i]["Gb"].split('\n');
+                var o_title = overlays1[i]["cc"];
+                if (o_title.includes(m_title[0])) {
+                    overlays1[i].setMap(null);
+                }
+            }
+        }
+
+        function closeOverlay2() {
+            // 마커 갯수만큼 반복을 돌린다.
+            for (let i = 0; i < marker2.length; i++) {
+                var m_title = marker2[i]["Gb"].split('\n');
+                var o_title = overlays2[i]["cc"];
+                if (o_title.includes(m_title[0])) {
+                    overlays2[i].setMap(null);
+                }
+            }
+        }
+
+
+        function closeOverlay3() {
+            // 마커 갯수만큼 반복을 돌린다.
+            for (let i = 0; i < marker3.length; i++) {
+                var m_title = marker3[i]["Gb"].split('\n');
+                var o_title = overlays3[i]["cc"];
+                if (o_title.includes(m_title[0])) {
+                    overlays3[i].setMap(null);
+                }
+            }
+        }
+
+
+        function closeOverlay4() {
+            // 마커 갯수만큼 반복을 돌린다.
+            for (let i = 0; i < marker4.length; i++) {
+                var m_title = marker4[i]["Gb"].split('\n');
+                var o_title = overlays4[i]["cc"];
+                if (o_title.includes(m_title[0])) {
+                    overlays4[i].setMap(null);
+                }
+            }
+        }
+        // ------------------------------------------------------------
+
+
+
+        // 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
+        function makeOverListener1(map, marker1, infowindow) {
+            return function () {
+                infowindow.open(map, marker1);
+            };
+        }
+
+        // 인포윈도우를 닫는 클로저를 만드는 함수입니다 
+        function makeOutListener1(infowindow) {
+            return function () {
+                infowindow.close();
+            };
+        }
+
+
+        // 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
+        function makeOverListener2(map, marker2, infowindow2) {
+            return function () {
+                infowindow2.open(map, marker2);
+            };
+        }
+
+        // 인포윈도우를 닫는 클로저를 만드는 함수입니다 
+        function makeOutListener2(infowindow2) {
+            return function () {
+                infowindow2.close();
+            };
+        }
+
+
+        // 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
+        function makeOverListener3(map, marker3, infowindow) {
+            return function () {
+                infowindow.open(map, marker3);
+            };
+        }
+
+        // 인포윈도우를 닫는 클로저를 만드는 함수입니다 
+        function makeOutListener3(infowindow) {
+            return function () {
+                infowindow.close();
+            };
+        }
+
+
+        // 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
+        function makeOverListener4(map, marker4, infowindow) {
+            return function () {
+                infowindow.open(map, marker4);
+            };
+        }
+
+        // 인포윈도우를 닫는 클로저를 만드는 함수입니다 
+        function makeOutListener4(infowindow) {
+            return function () {
+                infowindow.close();
+            };
+        }
+
+
+
+
+
+        // ----------------------- < 약국 버튼 > -----------------------
+        function bt1(e) {
+            const xhr = new XMLHttpRequest(); //xml파일을 읽을 준비
+            // xml을 실행시켜서 데이터가 저장된 json파일에 접근
+            xhr.open('GET', 'pharmacy.json', true);
+            xhr.onload = function () {//loadData를 실행하면 자동으로 실행됨
+                if (xhr.status === 200) {
+                    pharmacy = JSON.parse(xhr.responseText);//jon파일에 접근
+
+                    //마커 취소2,3,4
+                    if (marker2 != null) {
+                        RemoveMaker2();
+                    }
+                    if (marker3 != null) {
+                        RemoveMaker3();
+                    }
+                    if (marker4 != null) {
+                        RemoveMaker4();
+                    }
+                    closeOverlay2();
+                    closeOverlay3();
+                    closeOverlay4();
+
+
+
+                    positions1 = [];
+
+                    // 마커에 넣을 정보 만들기
+                    for (var i = 0; i < pharmacy.length; i++) {
+                        var dic = {
+                            title: pharmacy[i]["약국명"] + "\n" + pharmacy[i]["대표전화"] + "\n" + pharmacy[i]["주소"],
+                            latlng: new kakao.maps.LatLng(pharmacy[i]["Latitude"], pharmacy[i]["Longitude"])
+                        }
+                        positions1.push(dic);
+                    }
+
+
+                    var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+
+
+                    // 마커 생성하기
+                    for (var i = 0; i < positions1.length; i++) {
+
+                        // console.log(positions);
+                        // 마커 이미지의 이미지 크기 입니다
+                        var imageSize = new kakao.maps.Size(11, 15);
+
+                        // 마커 이미지를 생성합니다    
+                        var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+                        // 마커를 생성합니다
+                        var markerpush1 = new kakao.maps.Marker({
+                            map: map,                        // 마커를 표시할 지도
+                            position: positions1[i].latlng,  // 마커를 표시할 위치
+                            title: positions1[i].title,      // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+                            image: markerImage,               // 마커 이미지
+                        });
+
+
+                        // 마커에 표시할 인포윈도우를 생성합니다 
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: positions1[i].title, // 인포윈도우에 표시할 내용
+                            tal: positions1[i].tal
+                        });
+
+
+
+
+                        var content = '<div class="wrap">' +
+                            '    <div class="info">' +
+                            '        <div class="title" align="center" >' +
+                            pharmacy[i]["약국명"] +
+                            '            <div class="close" onclick="closeOverlay1()" title="닫기"></div>' +
+                            '        </div>' +
+                            '        <div class="body">' +
+                            '           </div>' +
+                            '            <div align="center" >' +
+                            '                <div class="ellipsis">' + pharmacy[i]["주소"] + '</div>' +
+                            '                <div class="jibun ellipsis">' + pharmacy[i]["대표전화"] + '</div>' +
+                            '            </div>' +
+                            '        </div>' +
+                            '    </div>' +
+                            '</div>';
+
+
+
+                        var overlay = new kakao.maps.CustomOverlay({
+                            content: content,           // 오버레이의 정보 담는다.
+                            position: markerpush1.getPosition() // 오버레이에 담을 포지션값.
+                        });
+
+
+                        // 각 오버레이 객체를 따로 list로 저장.
+                        overlays1.push(overlay);
+
+
+                        // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+                        // 이벤트 리스너로는 클로저를 만들어 등록합니다 
+                        // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+                        // kakao.maps.event.addListener(markerpush1, 'mouseover', makeOverListener1(map, markerpush1, infowindow));
+                        // kakao.maps.event.addListener(markerpush1, 'mouseout', makeOutListener1(infowindow));
+
+
+                        marker1.push(markerpush1)
+                    }
+
+                    // [ 각 마커 띄우기 이론 ]
+                    // 마커[i].title에 "\n"을 구분자로 자른 값과
+                    // overlays1[i].content 값이 같다면
+                    // 같은 위치에 있는 것이다.
+
+                    // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+                    for (let i = 0; i < marker1.length; i++) {
+                        kakao.maps.event.addListener(marker1[i], 'click', function () {
+                            //console.log(marker1[i]);
+                            //console.log(marker1[i]["Gb"]);
+                            // 마커 갯수만큼 반복을 돌린다.
+                            var m_title = marker1[i]["Gb"].split('\n');
+                            //console.log(m_title[0])
+                            //console.log(overlays1[i])
+                            //console.log(overlays1[i]["cc"])
+                            var o_title = overlays1[i]["cc"];
+                            //console.log(o_title.includes(m_title[0]));
+                            if (o_title.includes(m_title[0])) {
+                                overlays1[i].setMap(map);
+                            }
+                        });
+                    }
+
+                }
+            }
+            xhr.send();
+
+        }
+
+
+
+        function bt2(e) {
+            const xhr2 = new XMLHttpRequest(); //xml파일을 읽을 준비
+            // xml을 실행시켜서 데이터가 저장된 json파일에 접근
+            xhr2.open('GET', 'clinicjson.json', true);
+            xhr2.onload = function () {//loadData를 실행하면 자동으로 실행됨
+
+
+                if (xhr2.status === 200) {
+                    clinicjson = JSON.parse(xhr2.responseText);//jon파일에 접근
+
+                    // var positions = [];
+                    positions2 = [];
+
+
+                    if (marker1 != null) {
+                        RemoveMaker1();
+                    }
+                    if (marker3 != null) {
+                        RemoveMaker3();
+                    }
+                    if (marker4 != null) {
+                        RemoveMaker4();
+                    }
+                    closeOverlay1();
+                    closeOverlay3();
+                    closeOverlay4();
+
+
+                    for (var i = 0; i < clinicjson.length; i++) {
+
+                        var dic = {
+                            title: clinicjson[i]["name"],
+                            latlng: new kakao.maps.LatLng(clinicjson[i]["Latitude"], clinicjson[i]["Longitude"])
+                        }
+                        positions2.push(dic)
+
+                    }
+
+
+                    var imageSrc = 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png';
+
+                    for (var i = 0; i < positions2.length; i++) {
+
+                        // console.log(positions);
+                        // 마커 이미지의 이미지 크기 입니다
+                        var imageSize = new kakao.maps.Size(15, 15);
+
+                        // 마커 이미지를 생성합니다    
+                        var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+                        // 마커를 생성합니다
+                        // var marker2 = new kakao.maps.Marker({
+                        var markerpush2 = new kakao.maps.Marker({
+
+                            map: map, // 마커를 표시할 지도
+                            position: positions2[i].latlng, // 마커를 표시할 위치
+                            title: positions2[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+                            image: markerImage // 마커 이미지 
+                        });
+
+
+                        // 마커에 표시할 인포윈도우를 생성합니다 
+                        var infowindow2 = new kakao.maps.InfoWindow({
+                            content: positions2[i].title // 인포윈도우에 표시할 내용
+
+                        });
+                        // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+                        // 이벤트 리스너로는 클로저를 만들어 등록합니다 
+                        // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+                        // kakao.maps.event.addListener(markerpush2, 'mouseover', makeOverListener2(map, markerpush2, infowindow2));
+                        // kakao.maps.event.addListener(markerpush2, 'mouseout', makeOutListener2(infowindow2));
+
+
+                        var content = '<div class="wrap">' +
+                            '    <div class="info">' +
+                            '        <div class="title" align="center" >' +
+                            clinicjson[i]["name"] +
+                            '            <div class="close" onclick="closeOverlay2()" title="닫기"></div>' +
+                            '        </div>' +
+                            '        <div class="body">' +
+                            '           </div>' +
+                            '            <div align="center" >' +
+                            '                <div class="ellipsis">' + clinicjson[i]["address"] + '</div>' +
+                            '                <div class="jibun ellipsis">' + clinicjson[i]["number"] + '</div>' +
+                            '            </div>' +
+                            '        </div>' +
+                            '    </div>' +
+                            '</div>';
+
+
+                        var overlay = new kakao.maps.CustomOverlay({
+                            content: content,           // 오버레이의 정보 담는다.
+                            position: markerpush2.getPosition() // 오버레이에 담을 포지션값.
+                        });
+
+
+                        // 각 오버레이 객체를 따로 list로 저장.
+                        overlays2.push(overlay);
+
+
+                        marker2.push(markerpush2)
+                    }
+
+
+                    // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+                    for (let i = 0; i < marker2.length; i++) {
+                        kakao.maps.event.addListener(marker2[i], 'click', function () {
+                            //console.log(marker1[i]);
+                            //console.log(marker1[i]["Gb"]);
+                            // 마커 갯수만큼 반복을 돌린다.
+                            var m_title = marker2[i]["Gb"].split('\n');
+                            //console.log(m_title[0])
+                            //console.log(overlays1[i])
+                            //console.log(overlays1[i]["cc"])
+                            var o_title = overlays2[i]["cc"];
+                            //console.log(o_title.includes(m_title[0]));
+                            if (o_title.includes(m_title[0])) {
+                                overlays2[i].setMap(map);
+                            }
+                        });
+                    }
+
+                }
+            }
+            xhr2.send();
+
+        }
+
+
+
+
+
+
+
+        function bt3(e) {
+            const xhr3 = new XMLHttpRequest(); //xml파일을 읽을 준비
+            // xml을 실행시켜서 데이터가 저장된 json파일에 접근
+            xhr3.open('GET', 'hospitalData.json', true);
+            xhr3.onload = function () {//loadData를 실행하면 자동으로 실행됨
+                if (xhr3.status === 200) {
+                    hospital = JSON.parse(xhr3.responseText);//jon파일에 접근
+
+                    if (marker1 != null) {
+                        RemoveMaker1();
+                    }
+                    if (marker2 != null) {
+                        RemoveMaker2();
+                    }
+                    if (marker4 != null) {
+                        RemoveMaker4();
+                    }
+                    closeOverlay1();
+                    closeOverlay2();
+                    closeOverlay4();
+
+
+                    positions3 = [];
+
+                    for (var i = 0; i < hospital.length; i++) {
+
+                        var dic = {
+                            title: hospital[i]["name"],
+                            latlng: new kakao.maps.LatLng(hospital[i]["Latitude"], hospital[i]["Longitude"])
+                        }
+                        positions3.push(dic)
+
+                    }
+
+
+                    var imageSrc = "http://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png ";
+
+                    for (var i = 0; i < positions3.length; i++) {
+                        // console.log(positions);
+                        // 마커 이미지의 이미지 크기 입니다
+                        var imageSize = new kakao.maps.Size(14, 20);
+
+                        // 마커 이미지를 생성합니다    
+                        var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+                        // 마커를 생성합니다
+                        // var marker1 = new kakao.maps.Marker({
+                        var markerpush3 = new kakao.maps.Marker({
+
+                            map: map, // 마커를 표시할 지도
+                            position: positions3[i].latlng, // 마커를 표시할 위치
+                            title: positions3[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+                            image: markerImage // 마커 이미지 
+
+                        });
+
+                        // 마커에 표시할 인포윈도우를 생성합니다 
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: positions3[i].title, // 인포윈도우에 표시할 내용
+                            tal: positions3[i].tal
+
+                        });
+
+
+                        var content = '<div class="wrap">' +
+                            '    <div class="info">' +
+                            '        <div class="title" align="center" >' +
+                                hospital[i]["name"] +
+                            '            <div class="close" onclick="closeOverlay3()" title="닫기"></div>' +
+                            '        </div>' +
+                            '        <div class="body">' +
+                            '           </div>' +
+                            '            <div align="center" >' +
+                            '                <div class="ellipsis">' + hospital[i]["address"] + '</div>' +
+                            '                <div class="jibun ellipsis">' + hospital[i]["number"] + '</div>' +
+                            '            </div>' +
+                            '        </div>' +
+                            '    </div>' +
+                            '</div>';
+
+
+                        var overlay = new kakao.maps.CustomOverlay({
+                            content: content,           // 오버레이의 정보 담는다.
+                            position: markerpush3.getPosition() // 오버레이에 담을 포지션값.
+                        });
+
+                        // 각 오버레이 객체를 따로 list로 저장.
+                        overlays3.push(overlay);
+
+                        // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+                        // 이벤트 리스너로는 클로저를 만들어 등록합니다 
+                        // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+                        // kakao.maps.event.addListener(markerpush3, 'mouseover', makeOverListener1(map, markerpush3, infowindow));
+                        // kakao.maps.event.addListener(markerpush3, 'mouseout', makeOutListener1(infowindow));
+
+
+                        marker3.push(markerpush3)
+
+                    }
+
+                    // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+                    for (let i = 0; i < marker3.length; i++) {
+                        kakao.maps.event.addListener(marker3[i], 'click', function () {
+                            // 마커 갯수만큼 반복을 돌린다.
+                            var m_title = marker3[i]["Gb"].split('\n');
+                            var o_title = overlays3[i]["cc"];
+
+                            if (o_title.includes(m_title[0])) {
+                                overlays3[i].setMap(map);
+                            }
+                        });
+                    }
+
+                }
+            }
+            xhr3.send();
+
+        }
+
+
+
+        function bt4(e) {
+            const xhr4 = new XMLHttpRequest(); //xml파일을 읽을 준비
+            // xml을 실행시켜서 데이터가 저장된 json파일에 접근
+            xhr4.open('GET', 'moon.json', true);
+            xhr4.onload = function () {//loadData를 실행하면 자동으로 실행됨
+                if (xhr4.status === 200) {
+                    moon = JSON.parse(xhr4.responseText);//jon파일에 접근
+
+
+                    if (marker1 != null) {
+                        RemoveMaker1();
+                    }
+                    if (marker2 != null) {
+                        RemoveMaker2();
+                    }
+                    if (marker3 != null) {
+                        RemoveMaker3();
+                    }
+                    closeOverlay1();
+                    closeOverlay2();
+                    closeOverlay3();
+
+
+                    positions4 = [];
+
+                    for (var i = 0; i < moon.length; i++) {
+
+                        var dic = {
+                            title: moon[i]["title"],
+                            tal: moon[i]["phoneNum"],
+                            latlng: new kakao.maps.LatLng(moon[i]["Latitude"], moon[i]["Longitude"])
+                        }
+                        positions4.push(dic)
+
+                    }
+
+
+
+                    var imageSrc = "https://cdn0.iconfinder.com/data/icons/social-23/100/social_facebook_places-512.png";
+
+                    for (var i = 0; i < positions4.length; i++) {
+
+                        // console.log(positions);
+                        // 마커 이미지의 이미지 크기 입니다
+                        var imageSize = new kakao.maps.Size(22, 25);
+
+                        // 마커 이미지를 생성합니다    
+                        var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+                        // 마커를 생성합니다
+                        // var marker1 = new kakao.maps.Marker({
+                        var markerpush4 = new kakao.maps.Marker({
+
+                            map: map, // 마커를 표시할 지도
+                            position: positions4[i].latlng, // 마커를 표시할 위치
+                            title: positions4[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+                            image: markerImage // 마커 이미지 
+
+                        });
+
+                        // 마커에 표시할 인포윈도우를 생성합니다 
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: positions4[i].title, // 인포윈도우에 표시할 내용 
+                        });
+
+
+                        var content = '<div class="wrap">' +
+                            '    <div class="info">' +
+                            '        <div class="title" align="center" >' +
+                                moon[i]["title"] +
+                            '            <div class="close" onclick="closeOverlay4()" title="닫기"></div>' +
+                            '        </div>' +
+                            '        <div class="body">' +
+                            '           </div>' +
+                            '            <div align="center" >' +
+                            '                <div class="ellipsis">' + moon[i]["address"] + '</div>' +
+                            '                <div class="jibun ellipsis">' + moon[i]["phoneNum"] + '</div>' +
+                            '            </div>' +
+                            '        </div>' +
+                            '    </div>' +
+                            '</div>';
+
+
+
+                        var overlay = new kakao.maps.CustomOverlay({
+                            content: content,           // 오버레이의 정보 담는다.
+                            position: markerpush4.getPosition() // 오버레이에 담을 포지션값.
+                        });
+
+
+                        // 각 오버레이 객체를 따로 list로 저장.
+                        overlays4.push(overlay);
+
+
+
+                        // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+                        // 이벤트 리스너로는 클로저를 만들어 등록합니다 
+                        // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+                        // kakao.maps.event.addListener(markerpush4, 'mouseover', makeOverListener1(map, markerpush4, infowindow));
+                        // kakao.maps.event.addListener(markerpush4, 'mouseout', makeOutListener1(infowindow));
+                        
+                        
+                        marker4.push(markerpush4)
+                    }
+
+                    // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+                    for (let i = 0; i < marker4.length; i++) {
+                        kakao.maps.event.addListener(marker4[i], 'click', function () {
+                            // 마커 갯수만큼 반복을 돌린다.
+                            var m_title = marker4[i]["Gb"].split('\n');
+                            var o_title = overlays4[i]["cc"];
+
+                            if (o_title.includes(m_title[0])) {
+                                overlays4[i].setMap(map);
+                            }
+                        });
+                    }
+
+
+                }
+            }
+            xhr4.send();
+
+        }
+
+
+    </script>
+
+</body>
+</html>
