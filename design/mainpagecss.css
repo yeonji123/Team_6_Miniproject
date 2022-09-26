@@ -1,0 +1,257 @@
+/*
+#logo{
+    background:#ddf;
+}
+#menu{
+    background:#eee;
+}
+#mapsection{
+    background:red;
+}
+#map{
+    background:blue;
+    float:left;
+}
+*/
+#menusection{
+    /* background:aqua; */
+    height: 120px;
+    margin-left: auto; margin-right: auto;
+}
+#logo{
+    background:#ddf;
+    height:60px;
+    vertical-align: middle;
+}
+#menu{
+    background:#eee;
+    height:50px;
+    vertical-align: middle;
+}
+
+#mapsize{
+    background:wheat;
+    width:75%;
+    height:550px;
+    float:left;
+}
+#map{
+    height:500px;
+}
+#searchsection{
+    background-color: #ebecef;
+    width:25%;
+    height:700px;
+    float:left;
+    align-items: center;
+}
+#searchP{
+    background:#416df4;
+    width:100%;
+    height:110px;
+    vertical-align: middle;
+    align-items: center;
+}
+
+#search{
+    width:400px;
+    height:45px;
+}
+#searchB{
+    width:80px;
+    height:45px;
+}
+
+#result{
+    background:#aaa;
+    width:100%;
+    height:450px;
+
+}
+
+#tablein{
+    margin-left:auto; 
+    margin-right:auto;
+    border-color: blue;
+}
+#logoImage{
+    width: 60px;
+    height: 60px;
+    object-fit:cover;
+}
+
+#menu1{
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-right: 3px;
+}
+
+#menu2{
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-right: 3px;
+}
+
+/* 
+
+#menu_btn button{
+    border: 1px solid rgb(0, 0, 0);
+    background-color: rgb(210, 245, 215);
+    color: black;
+    padding: 5px;
+}
+
+#menu_btn button:hover{
+    color:black;
+    background-color: rgb(166, 241, 177);
+}
+
+#menu_btn button:active{
+    background-color: rgb(41, 196, 61);
+}
+.w-btn-green2-outline {
+    border: 3px solid #519d9e;
+    color: darkgray;
+}
+
+.head{
+    display: flex;
+    
+}
+.menu_head{
+    display: flex;
+}
+ */
+
+ input {
+    width: 500px;
+    height: 45px;
+    font-size: 15px;
+    border: 0;
+    border-radius: 15px;
+    outline: none;
+    padding-left: 10px;
+    background-color: rgb(233, 233, 233);
+  }
+
+
+#container{
+    color:white;
+}
+
+
+
+
+
+
+/* 마커 css */
+
+.wrap {
+    position: absolute;
+    left: 0;
+    bottom: 40px;
+    width: 288px;
+    height: 132px;
+    margin-left: -144px;
+    text-align: left;
+    overflow: hidden;
+    font-size: 12px;
+    font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;
+    line-height: 1.5;
+}
+
+.wrap * {
+    padding: 0;
+    margin: 0;
+}
+
+.wrap .info {
+    width: 100;
+    height: 80px;
+    border-radius: 5px;
+    border-bottom: 2px solid #ccc;
+    border-right: 1px solid #ccc;
+    overflow: hidden;
+    background: #fff;
+}
+
+.wrap .info:nth-child(1) {
+    border: 0;
+    box-shadow: 0px 1px 2px #888;
+}
+
+.info .title {
+    padding: 5px 0 0 10px;
+    height: 30px;
+    background: #eee;
+    border-bottom: 1px solid #ddd;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.info .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #888;
+    width: 17px;
+    height: 17px;
+    background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/overlay_close.png');
+}
+
+.info .close:hover {
+    cursor: pointer;
+}
+
+.info .body {
+    position: relative;
+    overflow: hidden;
+}
+
+.info .desc {
+    position: relative;
+    margin: 13px 0 0 90px;
+    height: 75px;
+}
+
+.desc .ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.desc .jibun {
+    font-size: 11px;
+    color: #888;
+    margin-top: -2px;
+}
+
+.info .img {
+    position: absolute;
+    top: 6px;
+    left: 5px;
+    width: 73px;
+    height: 71px;
+    border: 1px solid #ddd;
+    color: #888;
+    overflow: hidden;
+}
+
+.info:after {
+    content: '';
+    position: absolute;
+    margin-left: -12px;
+    left: 50%;
+    bottom: 0;
+    width: 22px;
+    height: 12px;
+    background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')
+}
+
+.info .link {
+    color: #5085BB;
+}
